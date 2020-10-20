@@ -1,3 +1,5 @@
+
+
 /******************************************************************************
  * The MIT License (MIT)
  *
@@ -146,6 +148,7 @@ CaptureDialog::CaptureDialog(ICaptureContext &ctx, OnCaptureMethod captureCallba
 {
   ui->setupUi(this);
 
+  // 设置字体
   ui->exePath->setFont(Formatter::PreferredFont());
   ui->workDirPath->setFont(Formatter::PreferredFont());
   ui->cmdline->setFont(Formatter::PreferredFont());
@@ -233,10 +236,15 @@ CaptureDialog::~CaptureDialog()
   delete ui;
 }
 
+// 根据2种启动模式: 
+//  * 注入
+//  * 手动启动
+//  调整界面UI显示
 void CaptureDialog::SetInjectMode(bool inject)
 {
   m_Inject = inject;
 
+  // 注入到进程模式
   if(inject)
   {
     ui->injectGroup->setVisible(true);
@@ -253,6 +261,7 @@ void CaptureDialog::SetInjectMode(bool inject)
   }
   else
   {
+      // 手动启动程序模式
     ui->injectGroup->setVisible(false);
     ui->exeGroup->setVisible(true);
     ui->topVerticalSpacer->spacerItem()->changeSize(0, 0, QSizePolicy::Minimum,
@@ -949,6 +958,7 @@ void CaptureDialog::on_loadLastCapture_clicked()
   LoadSettings(mostRecentFilename());
 }
 
+// 点击Launch按钮
 void CaptureDialog::on_launch_clicked()
 {
   TriggerCapture();
@@ -1212,6 +1222,7 @@ void CaptureDialog::SetEnvironmentModifications(const rdcarray<EnvironmentModifi
 
 void CaptureDialog::TriggerCapture()
 {
+    // 注入模式  
   if(IsInjectMode())
   {
     QModelIndexList sel = ui->processList->selectionModel()->selectedRows();
@@ -1240,8 +1251,11 @@ void CaptureDialog::TriggerCapture()
   }
   else
   {
+    // 还没有注入
+    // 从UI获取启动的exe路径
     QString exe = ui->exePath->text().trimmed();
 
+    // 弹窗提示
     if(exe.isEmpty())
     {
       RDDialog::critical(this, tr("No executable selected"),
@@ -1249,6 +1263,8 @@ void CaptureDialog::TriggerCapture()
                             "above to select the program to launch."));
       return;
     }
+
+    // 如果是本地运行，检查文件是否存在  
 
     // for non-remote captures, check the executable locally
     if(!m_Ctx.Replay().CurrentRemote().IsValid())
@@ -1261,6 +1277,7 @@ void CaptureDialog::TriggerCapture()
       }
     }
 
+    // 检查working directory
     QString workingDir;
 
     // for non-remote captures, check the directory locally
@@ -1270,16 +1287,19 @@ void CaptureDialog::TriggerCapture()
     }
     else
     {
+      // 本地检测，working directory存在！  
       if(QDir(ui->workDirPath->text()).exists())
         workingDir = ui->workDirPath->text();
     }
 
+    // ui上填写的命令行参数  
     QString cmdLine = ui->cmdline->text();
 
     SaveSettings(mostRecentFilename());
 
     PopulateMostRecent();
 
+    // adb的时候，检查参数？ 
     if(m_Ctx.Replay().CurrentRemote().Protocol() &&
        m_Ctx.Replay().CurrentRemote().Protocol()->GetProtocolName() == "adb")
     {

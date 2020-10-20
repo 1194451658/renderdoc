@@ -104,10 +104,15 @@ struct CaptureSettings
 
   DOCUMENT("The :class:`~renderdoc.CaptureOptions` with fine-tuned settings for the capture.");
   CaptureOptions options;
+
   DOCUMENT(
       "``True`` if the described capture is an inject-into-process instead of a launched "
       "executable.");
+  // 2种模式：
+  //    * 注入模式
+  //    * Launch启动模式
   bool inject;
+
   DOCUMENT("``True`` if this capture settings object should be immediately executed upon load.");
   bool autoStart;
   DOCUMENT("The path to the executable to run.");

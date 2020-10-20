@@ -47,6 +47,7 @@ public:
                              const rdcarray<EnvironmentModification> &env, CaptureOptions opts,
                              std::function<void(LiveCapture *)> callback)>
       OnCaptureMethod;
+
   typedef std::function<void(uint32_t PID, const rdcarray<EnvironmentModification> &env, const QString &name,
                              CaptureOptions opts, std::function<void(LiveCapture *)> callback)>
       OnInjectMethod;
